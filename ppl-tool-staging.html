@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>PPL Content Tool</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f5;color:#111;min-height:100vh;padding:24px}
+.container{max-width:960px;margin:0 auto}
+h1{font-size:20px;font-weight:600;margin-bottom:4px}
+.subtitle{font-size:13px;color:#888;margin-bottom:24px}
+.card{background:#fff;border:1px solid #e5e5e5;border-radius:12px;padding:20px;margin-bottom:16px}
+.section-title{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:400;padding:2px 8px;background:#f0f0f0;color:#666;border-radius:20px}
+.label{font-size:12px;color:#888;margin-bottom:5px}
+input,select{width:100%;padding:8px 10px;border:1px solid #e0e0e0;border-radius:8px;background:#fafafa;color:#111;font-size:13px;font-family:inherit;outline:none}
+input:focus,select:focus{border-color:#aaa;background:#fff}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.toolbar{display:flex;gap:8px;align-items:center;margin-bottom:10px}
+.toolbar input{flex:1}
+.view-toggle{display:flex;border:1px solid #e0e0e0;border-radius:8px;overflow:hidden;flex-shrink:0}
+.view-btn{padding:6px 12px;background:#fff;border:none;cursor:pointer;font-size:12px;color:#888;transition:all 0.15s}
+.view-btn.active{background:#111;color:#fff}
+.char-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.char-card{border:2px solid #e5e5e5;border-radius:8px;padding:8px;cursor:pointer;text-align:center;transition:all 0.15s}
+.char-card:hover{border-color:#999}
+.char-card.selected{border-color:#111;background:#f9f9f9}
+.char-card img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;margin-bottom:4px;background:#f0f0f0}
+.char-card .cname{font-size:10px;color:#666;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.char-list{border:1px solid #eee;border-radius:8px;overflow:hidden}
+.char-list-item{display:flex;align-items:center;gap:12px;padding:8px 12px;border-bottom:1px solid #f0f0f0;cursor:pointer;transition:background 0.1s}
+.char-list-item:last-child{border-bottom:none}
+.char-list-item:hover{background:#f9f9f9}
+.char-list-item.selected{background:#f0f0f0}
+.char-list-item img{width:40px;height:40px;object-fit:cover;border-radius:6px;background:#f0f0f0;flex-shrink:0}
+.char-list-item .cname{font-size:13px;color:#111}
+.btn{padding:8px 14px;border:1px solid #ddd;border-radius:8px;background:#fff;color:#111;font-size:13px;cursor:pointer;font-family:inherit;transition:all 0.15s}
+.btn:hover{background:#f5f5f5;border-color:#bbb}
+.btn-primary{background:#111;color:#fff;border-color:#111;width:100%;padding:12px;font-size:14px;font-weight:500;border-radius:10px}
+.btn-primary:hover{background:#333}
+.btn-drive{background:#1a73e8;color:#fff;border-color:#1a73e8;padding:8px 16px;border-radius:8px;font-size:13px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn-drive:hover{background:#1557b0}
+.search-row{display:flex;gap:8px;margin-bottom:10px}
+.search-row input{flex:1}
+.dance-list{max-height:240px;overflow-y:auto;border:1px solid #eee;border-radius:8px}
+.dance-row{padding:10px 12px;border-bottom:1px solid #f0f0f0;display:flex;align-items:center;gap:10px;cursor:pointer;transition:background 0.1s}
+.dance-row:hover,.dance-row.selected{background:#f9f9f9}
+.dance-row:last-child{border-bottom:none}
+.song{font-size:13px;font-weight:500;flex:1}
+.artist{font-size:12px;color:#888}
+.watch-link{font-size:11px;color:#0066cc;text-decoration:none;white-space:nowrap}
+.watch-link:hover{text-decoration:underline}
+.sel-info{font-size:12px;color:#22aa44;margin-top:8px;min-height:16px}
+.status{font-size:13px;padding:10px 12px;border-radius:8px;margin-top:10px;display:none}
+.status.show{display:block}
+.status.loading{background:#f5f5f5;color:#666}
+.status.success{background:#f0fff4;color:#22aa44;border:1px solid #d0f0d8}
+.status.error{background:#fff5f5;color:#cc2222;border:1px solid #f0d0d0}
+.result-box{background:#f9f9f9;border:1px solid #eee;border-radius:8px;padding:14px;margin-top:12px;display:none}
+.result-box.show{display:block}
+.rkey{font-size:11px;color:#888;margin-bottom:2px;text-transform:uppercase;letter-spacing:0.5px}
+.rval{font-size:13px;font-weight:500;color:#111;word-break:break-all;margin-bottom:10px;font-family:monospace}
+.empty{font-size:13px;color:#aaa;padding:16px;text-align:center}
+.upload-box{border:2px dashed #e0e0e0;border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;transition:border-color 0.15s}
+.upload-box:hover{border-color:#aaa}
+.upload-box p{font-size:13px;color:#888;margin-top:8px}
+.upload-box strong{font-size:14px;color:#111}
+.step-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0}
+.step-row:last-child{border-bottom:none}
+.step-num{width:24px;height:24px;border-radius:50%;background:#111;color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;color:#444;line-height:1.5}
+.step-text strong{color:#111}
+.tip{font-size:12px;color:#888;background:#f9f9f9;border-radius:8px;padding:10px 12px;margin-top:12px}
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>PPL Content Tool</h1>
+  <p class="subtitle">Generate dance videos · shared character library · team access</p>
+
+  <div class="card">
+    <div class="section-title">Config</div>
+    <div class="grid2">
+      <div><div class="label">Backend URL</div><input id="baseUrl" value="https://staging-api.ppl.xyz"/></div>
+      <div><div class="label">API key</div><input id="apiKey" value="ppl-tool-local-dev"/></div>
+    </div>
+    <button class="btn" onclick="loadAll()">Reload data</button>
+  </div>
+
+  <div class="card">
+    <div class="section-title">Add a character</div>
+    <div class="upload-box">
+      <strong>Drop new characters into the shared Drive folder</strong>
+      <p>Any image added there appears for the whole team instantly</p>
+      <br/>
+      <a class="btn-drive" href="https://drive.google.com/drive/folders/1vv0ODYyFzzQNQjZWTxUV89H9d6X7u0a7" target="_blank">
+        Open shared Drive folder ↗
+      </a>
+    </div>
+    <div class="step-row">
+      <div class="step-num">1</div>
+      <div class="step-text">Click <strong>Open shared Drive folder</strong> above</div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">2</div>
+      <div class="step-text">Drag your character image into the folder — name it clearly e.g. <strong>cute-robot.png</strong></div>
+    </div>
+    <div class="step-row">
+      <div class="step-num">3</div>
+      <div class="step-text">Come back here and click <strong>Reload data</strong> — your character appears instantly</div>
+    </div>
+    <div class="tip">Tip: Use descriptive filenames — they become the character name in the tool. PNG or JPG, square images work best.</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">
+      1 — Pick character
+      <span class="badge" id="charCount">—</span>
+    </div>
+    <div class="toolbar">
+      <input id="charSearch" placeholder="Search characters..." oninput="filterChars()"/>
+      <div class="view-toggle">
+        <button class="view-btn active" id="gridBtn" onclick="setView('grid')">Grid</button>
+        <button class="view-btn" id="listBtn" onclick="setView('list')">List</button>
+      </div>
+      <button class="btn" onclick="loadAll()" style="flex-shrink:0">Reload</button>
+    </div>
+    <div id="charContainer"><div class="empty">Loading characters...</div></div>
+    <div class="sel-info" id="charSel"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">2 — Pick dance reference <span class="badge" id="danceCount">—</span></div>
+    <div class="search-row">
+      <input id="danceSearch" placeholder="Search song or artist..." oninput="filterDances()"/>
+    </div>
+    <div class="dance-list" id="danceList"><div class="empty">Loading dance references...</div></div>
+    <div class="sel-info" id="danceSel"></div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">3 — Motion template <span class="badge" id="tplCount">—</span></div>
+    <select id="tplSelect"><option value="">Loading templates...</option></select>
+    <div style="font-size:12px;color:#aaa;margin-top:6px">Needs staging DATABASE_URL to show real templates</div>
+  </div>
+
+  <div class="card">
+    <div class="section-title">4 — Generate</div>
+    <button class="btn-primary" onclick="generate()">Generate dance video</button>
+    <div class="status" id="genStatus"></div>
+    <div class="result-box" id="genResult">
+      <div class="rkey">Job ID</div><div class="rval" id="jobId">—</div>
+      <div class="rkey">Status</div><div class="rval" id="jobStatus">pending</div>
+      <button class="btn" style="margin-top:4px" onclick="poll()">Poll status</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let selectedChar=null,selectedDance=null,allDances=[],allChars=[],viewMode='grid';
+
+function base(){return document.getElementById('baseUrl').value.replace(/\/$/,'')}
+function key(){return document.getElementById('apiKey').value}
+function h(){return{'x-api-key':key(),'Content-Type':'application/json'}}
+function setStatus(id,type,msg){const el=document.getElementById(id);el.className='status show '+type;el.textContent=msg;}
+
+function setView(v){
+  viewMode=v;
+  document.getElementById('gridBtn').className='view-btn'+(v==='grid'?' active':'');
+  document.getElementById('listBtn').className='view-btn'+(v==='list'?' active':'');
+  filterChars();
+}
+
+async function loadAll(){loadCharacters();loadDances();loadTemplates();}
+
+async function loadCharacters(){
+  document.getElementById('charContainer').innerHTML='<div class="empty">Loading...</div>';
+  try{
+    const r=await fetch(`${base()}/tool/character-images`,{headers:h()});
+    const d=await r.json();
+    allChars=(d.data||d).images||[];
+    document.getElementById('charCount').textContent=allChars.length+' characters';
+    filterChars();
+  }catch(e){document.getElementById('charContainer').innerHTML=`<div class="empty" style="color:#cc2222">Error: ${e.message}</div>`;}
+}
+
+function filterChars(){
+  const q=document.getElementById('charSearch').value.toLowerCase();
+  renderChars(q?allChars.filter(c=>c.name.toLowerCase().includes(q)):allChars);
+}
+
+function renderChars(chars){
+  const c=document.getElementById('charContainer');
+  if(!chars.length){c.innerHTML='<div class="empty">No characters found</div>';return;}
+  const imgUrl=id=>`https://lh3.googleusercontent.com/d/${id}`;
+  if(viewMode==='grid'){
+    c.innerHTML=`<div class="char-grid">${chars.map(img=>`
+      <div class="char-card${selectedChar&&selectedChar.id===img.id?' selected':''}" onclick="selectChar('${img.id}','${img.name}',this)">
+        <img src="${imgUrl(img.id)}" onerror="this.style.background='#eee'"/>
+        <div class="cname">${img.name.replace('.png','').replace('.jpg','').replace(/-/g,' ')}</div>
+      </div>`).join('')}</div>`;
+  }else{
+    c.innerHTML=`<div class="char-list">${chars.map(img=>`
+      <div class="char-list-item${selectedChar&&selectedChar.id===img.id?' selected':''}" onclick="selectCharList('${img.id}','${img.name}',this)">
+        <img src="${imgUrl(img.id)}" onerror="this.style.background='#eee'"/>
+        <div class="cname">${img.name.replace('.png','').replace('.jpg','').replace(/-/g,' ')}</div>
+      </div>`).join('')}</div>`;
+  }
+}
+
+function selectChar(id,name,el){
+  selectedChar={id,name};
+  document.querySelectorAll('.char-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('charSel').textContent='Selected: '+name.replace('.png','').replace('.jpg','').replace(/-/g,' ');
+}
+
+function selectCharList(id,name,el){
+  selectedChar={id,name};
+  document.querySelectorAll('.char-list-item').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('charSel').textContent='Selected: '+name.replace('.png','').replace('.jpg','').replace(/-/g,' ');
+}
+
+async function loadDances(){
+  try{
+    const r=await fetch(`${base()}/tool/dance-references`,{headers:h()});
+    const d=await r.json();
+    allDances=(d.data||d).rows||[];
+    document.getElementById('danceCount').textContent=allDances.length+' references';
+    renderDances(allDances);
+  }catch(e){document.getElementById('danceList').innerHTML=`<div class="empty" style="color:#cc2222">Error: ${e.message}</div>`;}
+}
+
+function filterDances(){
+  const q=document.getElementById('danceSearch').value.toLowerCase();
+  renderDances(q?allDances.filter(d=>(d.song||'').toLowerCase().includes(q)||(d.artist||'').toLowerCase().includes(q)):allDances);
+}
+
+function renderDances(dances){
+  const list=document.getElementById('danceList');
+  const visible=dances.filter(d=>d['video link']||d.song);
+  if(!visible.length){list.innerHTML='<div class="empty">No results</div>';return;}
+  list.innerHTML=visible.map(d=>`
+    <div class="dance-row${selectedDance&&selectedDance['video link']===d['video link']?' selected':''}" onclick="selectDance(${allDances.indexOf(d)},this)">
+      <div style="flex:1">
+        <div class="song">${d.song||'(no title)'}</div>
+        ${d.artist?`<div class="artist">${d.artist}</div>`:''}
+      </div>
+      ${d['video link']?`<a class="watch-link" href="${d['video link']}" target="_blank" onclick="event.stopPropagation()">Watch ↗</a>`:''}
+    </div>`).join('');
+}
+
+function selectDance(idx,el){
+  selectedDance=allDances[idx];
+  document.querySelectorAll('.dance-row').forEach(r=>r.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('danceSel').textContent='Selected: '+(selectedDance.song||'(no title)')+(selectedDance.artist?' — '+selectedDance.artist:'');
+}
+
+async function loadTemplates(){
+  try{
+    const r=await fetch(`${base()}/tool/motion-templates`,{headers:h()});
+    const d=await r.json();
+    const tpls=(d.data||d)||[];
+    document.getElementById('tplCount').textContent=tpls.length+' templates';
+    const sel=document.getElementById('tplSelect');
+    if(!tpls.length){sel.innerHTML='<option value="">No templates — needs staging DB</option>';return;}
+    sel.innerHTML=tpls.map(t=>`<option value="${t.id}">${t.name||t.id}</option>`).join('');
+  }catch(e){document.getElementById('tplSelect').innerHTML='<option value="">Error loading</option>';}
+}
+
+async function generate(){
+  if(!selectedChar){setStatus('genStatus','error','Select a character first');return;}
+  const tpl=document.getElementById('tplSelect').value;
+  if(!tpl){setStatus('genStatus','error','No motion template — need staging DB URL first');return;}
+  setStatus('genStatus','loading','Sending request...');
+  try{
+    const body={source:'folder',imagePath:selectedChar.id,characterName:selectedChar.name.replace('.png','').replace('.jpg',''),motionTemplateId:tpl};
+    if(selectedDance)body.danceReference=selectedDance['video link'];
+    const r=await fetch(`${base()}/tool/dance-video`,{method:'POST',headers:h(),body:JSON.stringify(body)});
+    const d=await r.json();
+    setStatus('genStatus','success','Job created successfully');
+    document.getElementById('genResult').classList.add('show');
+    document.getElementById('jobId').textContent=d.jobId||d.data?.jobId||JSON.stringify(d);
+    document.getElementById('jobStatus').textContent='pending — click poll';
+  }catch(e){setStatus('genStatus','error','Error: '+e.message);}
+}
+
+async function poll(){
+  const jobId=document.getElementById('jobId').textContent;
+  if(!jobId||jobId==='—')return;
+  try{
+    const r=await fetch(`${base()}/tool/jobs/${jobId}/status`,{headers:h()});
+    const d=await r.json();
+    document.getElementById('jobStatus').textContent=d.status||JSON.stringify(d);
+  }catch(e){document.getElementById('jobStatus').textContent='Error: '+e.message;}
+}
+
+loadAll();
+</script>
+</body>
+</html>
