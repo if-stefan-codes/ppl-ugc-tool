@@ -362,10 +362,10 @@ async function generate(){
       }
     };
 
-    const r=await fetch('https://api.kie.ai/api/v1/generations',{
+    const r=await fetch('https://ppl-dance-api.vercel.app/api/generate',{
       method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':`Bearer ${s.kieApiKey}`},
-      body:JSON.stringify(payload)
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({characterImageUrl:selectedChar.driveUrl,videoUrl:videoUrl})
     });
     const d=await r.json();
     
