@@ -380,7 +380,7 @@ async function generate(){
     
     if(!r.ok||d.error){setStatus('genStatus','error','Error: '+(d.error?.message||d.message||JSON.stringify(d)));document.getElementById('generateBtn').disabled=false;return;}
     
-    const jobId=d.id||d.data?.id||d.task_id;
+    const jobId=d.taskId||d.id||d.data?.taskId;
     if(!jobId){setStatus('genStatus','error','No job ID returned: '+JSON.stringify(d));document.getElementById('generateBtn').disabled=false;return;}
     
     const job={
