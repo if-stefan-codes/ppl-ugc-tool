@@ -301,6 +301,15 @@ function selectChar(id,name,url,el){
 }
 
 async function loadDances(){
+  // Hardcoded dance references
+  allDances=[
+    {'song':'Tung Tung Tung Sahur','artist':'Viral Dance','video link':'https://static.aiquickdraw.com/tools/example/1767525918769_QyvTNib2.mp4'},
+    {'song':'Dance Reference 2','artist':'','video link':'https://static.aiquickdraw.com/tools/example/1767526000254_4PoHMzzY.mp4'},
+    {'song':'Dance Reference 3','artist':'','video link':'https://static.aiquickdraw.com/tools/example/1767526036774_S73pKcEK.mp4'}
+  ];
+  document.getElementById('danceCount').textContent=allDances.length+' references';
+  renderDances(allDances);
+  return;
   const s=getSettings();
   try{
     const r=await fetch(`${s.backendUrl}/tool/dance-references`,{headers:{'x-api-key':s.backendKey}});
