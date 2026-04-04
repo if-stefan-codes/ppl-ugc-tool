@@ -262,15 +262,11 @@ function setCustomVideo(){customVideoUrl=document.getElementById('customVideoUrl
 async function loadAll(){loadCharacters();loadDances();}
 
 async function loadCharacters(){
-  const s=getSettings();
   document.getElementById('charContainer').innerHTML='<div class="empty">Loading...</div>';
-  try{
-    const r=await fetch(`${s.backendUrl}/tool/character-images`,{headers:{'x-api-key':s.backendKey}});
-    const d=await r.json();
-    allChars=(d.data||d).images||[];
-    document.getElementById('charCount').textContent=allChars.length+' characters';
-    filterChars();
-  }catch(e){document.getElementById('charContainer').innerHTML=`<div class="empty" style="color:#ff6666">Error loading characters: ${e.message}</div>`;}
+  const knownIds=['10y1fzwYge8W_T8VPndoPkR-lIeeKOl9j','1S1xcXdTC_u807NZHohO7Xiji5M0vIv7b','1HynK6qvz2ZmcDQw8KdvWU0t2Xc-S7Bp-','12dbBZ0540VcXzVktO6EiDxmqUYRAci4P','1nr1V33d8wBPkPMKs9caFeaPxxcxrUajp','1uPlOOGg9FJzkZTdgZk7X5g0DjUnS-vmz','1uWzk5vAiJxIVJl2dluUU2zw7UXpW7XiJ','1E5C9X0xp5EHWJyUOz3BI8FOXX-qyi_Ft','1vlkfl3-uV22W4Meb5oN2JT7V29RjHN8F','1aewQLroEMpFu3ENJkdaXyizSr6ptap63'];
+  allChars=knownIds.map((id,i)=>({id,name:'Character '+(i+1),imgUrl:'https://lh3.googleusercontent.com/d/'+id,driveUrl:'https://lh3.googleusercontent.com/d/'+id}));
+  document.getElementById('charCount').textContent=allChars.length+' characters';
+  filterChars();
 }
 
 function filterChars(){
