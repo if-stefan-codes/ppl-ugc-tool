@@ -350,7 +350,7 @@ function selectDance(idx,el){
 
 async function generate(){
   const s=getSettings();
-  if(!s.kieApiKey){setStatus('genStatus','error','Add your kie.ai API key in Settings first');return;}
+  
   if(!selectedChar){setStatus('genStatus','error','Select a character first');return;}
   
   const videoUrl=customVideoUrl||(selectedDance&&selectedDance['video link'])||'';
