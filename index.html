@@ -463,12 +463,12 @@ async function pollOne(jobId){
   const job=jobs.find(j=>j.id===jobId);
   if(!job)return;
   try{
-    const r=await fetch(`https://api.kie.ai/api/v1/generations/${jobId}`,{headers:{'Authorization':`Bearer ${s.kieApiKey}`}});
+    const r=await fetch(`https://ppl-dance-api.vercel.app/api/status?taskId=${jobId}`);
     const d=await r.json();
-    const status=(d.status||d.data?.status||'').toLowerCase();
-    if(status==='succeeded'||status==='completed'){job.status='completed';job.videoUrl=d.output?.[0]||d.data?.output?.[0]||null;}
-    else if(status==='failed'){job.status='failed';}
-    else{job.status='processing';}
+    if(d.status==='completed'){job.status='completed';job.videoUrl=d.videoUrl||null;}
+    else if(d.status==='failed'){job.status='failed';}
+    else if(d.error){job.status='processing';}
+    else{job.status=d.status||'processing';}
     saveJobs();renderQueue();updateQueueBadge();
   }catch(e){alert('Error: '+e.message);}
 }
