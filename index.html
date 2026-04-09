@@ -412,6 +412,17 @@ function updateQueueBadge(){
 }
 
 async function refreshQueue(){
+  try{
+    const rr=await fetch('https://ppl-dance-api.vercel.app/api/jobs');
+    if(rr.ok){
+      const sj=await rr.json();
+      if(Array.isArray(sj)&&sj.length){
+        const lm=new Map(jobs.map(j=>[j.id,j]));
+        jobs=sj.map(s=>({...(lm.get(s.taskId)||{charName:'Character',charImg:'',videoName:'Dance'}),id:s.taskId,status:s.status,videoUrl:s.videoUrl,createdAt:s.createdAt})).sort((a,b)=>new Date(b.createdAt)-new Date(a.createdAt));
+        saveJobs();updateBadge();
+      }
+    }
+  }catch(e){}
   if(!jobs.length){document.getElementById('queueList').innerHTML='<div class="empty">No jobs yet</div>';return;}
   const s=getSettings();
   const active=jobs.filter(j=>j.status==='pending'||j.status==='processing');
